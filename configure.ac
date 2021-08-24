@@ -185,7 +185,7 @@ fi
 AC_DEFINE_UNQUOTED([ARENA_LIMIT_PER_KIND], $arena_limit, [Upper bound for number of arenas per kind])
 
 #============================memkind_prefix=======================================
-memkind_prefix=jemk_;
+memkind_prefix=;
 AC_ARG_VAR(MEMKIND_PREFIX,
   [Prefix used for all jemalloc public API under memkind, default value jemk_]
 )

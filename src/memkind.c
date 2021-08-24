@@ -20,6 +20,7 @@
 #include <memkind/internal/memkind_pmem.h>
 #include <memkind/internal/memkind_private.h>
 #include <memkind/internal/memkind_regular.h>
+#include <memkind/internal/memkind_numa.h>
 #include <memkind/internal/tbb_wrapper.h>
 
 #include "config.h"
@@ -172,6 +173,13 @@ static struct memkind MEMKIND_REGULAR_STATIC = {
     .init_once = PTHREAD_ONCE_INIT,
 };
 
+static struct memkind MEMKIND_NUMA_STATIC = {
+    .ops = &MEMKIND_NUMA_OPS,
+    .partition = MEMKIND_PARTITION_REGULAR,
+    .name = "memkind_numa",
+    .init_once = PTHREAD_ONCE_INIT,
+};
+
 static struct memkind MEMKIND_DAX_KMEM_STATIC = {
     .ops = &MEMKIND_DAX_KMEM_OPS,
     .partition = MEMKIND_PARTITION_DAX_KMEM,
@@ -271,6 +279,7 @@ MEMKIND_EXPORT struct memkind *MEMKIND_HBW_PREFERRED_GBTLB = &MEMKIND_HBW_PREFER
 MEMKIND_EXPORT struct memkind *MEMKIND_GBTLB = &MEMKIND_GBTLB_STATIC;
 MEMKIND_EXPORT struct memkind *MEMKIND_HBW_INTERLEAVE = &MEMKIND_HBW_INTERLEAVE_STATIC;
 MEMKIND_EXPORT struct memkind *MEMKIND_REGULAR = &MEMKIND_REGULAR_STATIC;
+MEMKIND_EXPORT struct memkind *MEMKIND_NUMA = &MEMKIND_NUMA_STATIC;
 MEMKIND_EXPORT struct memkind *MEMKIND_DAX_KMEM = &MEMKIND_DAX_KMEM_STATIC;
 MEMKIND_EXPORT struct memkind *MEMKIND_DAX_KMEM_ALL = &MEMKIND_DAX_KMEM_ALL_STATIC;
 MEMKIND_EXPORT struct memkind *MEMKIND_DAX_KMEM_PREFERRED = &MEMKIND_DAX_KMEM_PREFERRED_STATIC;
@@ -304,6 +313,7 @@ static struct memkind_registry memkind_registry_g = {
         [MEMKIND_PARTITION_HBW_INTERLEAVE] = &MEMKIND_HBW_INTERLEAVE_STATIC,
         [MEMKIND_PARTITION_INTERLEAVE] = &MEMKIND_INTERLEAVE_STATIC,
         [MEMKIND_PARTITION_REGULAR] = &MEMKIND_REGULAR_STATIC,
+        // [MEMKIND_PARTITION_NUMA] = &MEMKIND_NUMA_STATIC,
         [MEMKIND_PARTITION_HBW_ALL] = &MEMKIND_HBW_ALL_STATIC,
         [MEMKIND_PARTITION_HBW_ALL_HUGETLB] = &MEMKIND_HBW_ALL_HUGETLB_STATIC,
         [MEMKIND_PARTITION_DAX_KMEM] = &MEMKIND_DAX_KMEM_STATIC,
@@ -1011,4 +1021,14 @@ MEMKIND_EXPORT int memkind_stats_print(void (*write_cb)(void *, const char *),
                                        memkind_stat_print_opt opts)
 {
     return m_stats_print(write_cb, cbopaque, opts);
+}
+
+MEMKIND_EXPORT void memkind_set_mbind_node(memkind_t kind, int nodeID)
+{
+    kind->ops->set_mbind_node(kind, nodeID);
+}
+
+MEMKIND_EXPORT int memkind_get_mbind_node(memkind_t kind)
+{
+    return kind->ops->get_mbind_node(kind);
 }

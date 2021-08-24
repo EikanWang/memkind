@@ -396,6 +396,9 @@ memkind_t memkind_detect_kind(void *ptr);
 
 #include "memkind_deprecated.h"
 
+/// \warning EXTENDED API
+extern memkind_t MEMKIND_NUMA;
+
 /// \warning EXPERIMENTAL API
 extern memkind_t MEMKIND_REGULAR;
 
@@ -640,6 +643,9 @@ int memkind_check_dax_path(const char *pmem_dir);
 ///         on failure
 ///
 int memkind_set_bg_threads(bool state);
+
+void memkind_set_mbind_node(memkind_t kind, int nodeID);
+int memkind_get_mbind_node(memkind_t kind);
 
 #ifdef __cplusplus
 }

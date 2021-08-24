@@ -71,7 +71,7 @@ MEMKIND_EXPORT int memkind_set_arena_map_len(struct memkind *kind)
 {
     if (kind->ops->get_arena == memkind_bijective_get_arena) {
         kind->arena_map_len = 1;
-    } else if (kind->ops->get_arena == memkind_thread_get_arena) {
+    } else if (kind->ops->get_arena == memkind_thread_get_arena || kind == MEMKIND_NUMA) {
         char *arena_num_env = memkind_get_env("MEMKIND_ARENA_NUM_PER_KIND");
 
         if (arena_num_env) {
@@ -130,6 +130,7 @@ static void arena_config_init(void)
     10000 // copy-pasted from jemalloc/internal/arena_types.h
           // DIRTY_DECAY_MS_DEFAULT
 #define DIRTY_DECAY_MS_CONSERVATIVE 0
+#define NUMA_NODE_MAX 16                                                      \
 
 static struct memkind *arena_registry_g[MALLOCX_ARENA_MAX];
 static pthread_mutex_t arena_registry_write_lock;

@@ -28,6 +28,7 @@ libmemkind_la_SOURCES = src/hbwmalloc.c \
                         src/memkind_mem_attributes.c \
                         src/memkind_pmem.c \
                         src/memkind_regular.c \
+                        src/memkind_numa.c \
                         src/tbb_wrapper.c \
                         # end
 
@@ -59,6 +60,7 @@ noinst_HEADERS =  include/memkind/internal/heap_manager.h \
                   include/memkind/internal/memkind_pmem.h \
                   include/memkind/internal/memkind_private.h \
                   include/memkind/internal/memkind_regular.h \
+                  include/memkind/internal/memkind_numa.h \
                   include/memkind/internal/tbb_mem_pool_policy.h \
                   include/memkind/internal/tbb_wrapper.h \
                   include/memkind/internal/vec.h \
@@ -532,9 +534,8 @@ static_lib: libmemkind.la
 	cp libmemkind.a .libs/
 	rm libmemkind.a
 
-JEMALLOC_CONFIG = --enable-autogen @min_lg_align_opt@ --without-export --with-version=5.2.1-0-gea6b3e973b477b8061e0076bb257dbd7f3faa756 \
-			@jemalloc_build_type_flags@  @memkind_initial_exec_tls@ --with-jemalloc-prefix=@memkind_prefix@ \
-			--with-malloc-conf="narenas:@auto_arenas@,lg_tcache_max:@tcache_max_size_class@" \
+JEMALLOC_CONFIG = --enable-autogen --with-version=5.2.1-0-gea6b3e973b477b8061e0076bb257dbd7f3faa756 \
+			--with-jemalloc-prefix=@memkind_prefix@ \
 			#end
 
 jemalloc_deps:
